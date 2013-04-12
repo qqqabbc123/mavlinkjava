@@ -20,6 +20,10 @@ mkdir ..\distrib\Java\sources\org.mavlink.util
 xcopy /E /Y ..\org.mavlink.util\* ..\distrib\Java\sources\org.mavlink.util
 if errorlevel 1 goto :error
 
+mkdir ..\distrib\Java\sources\org.mavlink.maven
+xcopy /E /Y ..\org.mavlink.maven\* ..\distrib\Java\sources\org.mavlink.maven
+if errorlevel 1 goto :error
+
 
 goto :eof
 
