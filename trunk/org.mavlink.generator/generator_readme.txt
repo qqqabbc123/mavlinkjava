@@ -14,10 +14,11 @@ MAVLink can therefore be used without limits in any closed-source application wi
 This MAVLink Java generator uses MAVLink xml definition files to generate Java classes files.
 See the readme in org.mavlink.library to use MAVLink in your Java program. Here is only the use of MAVLinl Java generator.
 
-It is architectured with 3 Eclipse Java projects.
+It is architectured with 4 Eclipse Java projects.
 org.mavlink.generator : contains the generator and MAVLink xml files. Generated code is put in org.mavlink.library/generated folder.
 org.mavlink.library : Helpers for MAVLink and message. Contains generated code from generator.
 org.mavlink.util : CRC classes uses by generator and library.
+org.mavlink.maven : parent pom for the project
  
 After code generation, 2 jar descriptors in org.mavlink.library and org.mavlink.util projects can be used to generate jars for your application...
 
@@ -51,7 +52,7 @@ Example :
 III) INTEGRATION IN MAVLINK DISTRIBUTION
 ========================================
 
-Copy the 3 projects in a directory
+Copy the 4 projects in a directory
 Go in org.mavlink.generator and run makedistrib.sh (Linux) or makedistrib.bat (Windows)
 A distrib directory is generated at the same level as the 3 projects
 Copy the directory distrib/Java in the mavlink distribution : .../mavlink/pymavlink/generator
