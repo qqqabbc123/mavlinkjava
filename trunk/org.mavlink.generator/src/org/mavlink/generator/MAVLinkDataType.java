@@ -24,7 +24,7 @@ package org.mavlink.generator;
 
 /**
  * MAVLink data types and helpers
- * @author Capgemini
+ * @author GHelle
  * @version $Rev$
  */
 public class MAVLinkDataType {
