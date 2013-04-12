@@ -1,4 +1,4 @@
-echo off
+echo on
 
 REM set MAVLink Java generator version
 set version=1.00
