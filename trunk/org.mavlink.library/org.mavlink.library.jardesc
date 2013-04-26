@@ -12,8 +12,8 @@
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
         <file path="/org.mavlink.library/.project"/>
-        <javaElement handleIdentifier="=org.mavlink.library/test"/>
         <javaElement handleIdentifier="=org.mavlink.library/src"/>
+        <javaElement handleIdentifier="=org.mavlink.library/test"/>
         <javaElement handleIdentifier="=org.mavlink.library/generated"/>
         <file path="/org.mavlink.library/.pmd"/>
         <file path="/org.mavlink.library/.classpath"/>
