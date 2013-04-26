@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.mavlink</groupId>
 		<artifactId>org.mavlink.maven</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 		<relativePath>../org.mavlink.maven</relativePath>
 	</parent>
 	<artifactId>org.mavlink.generator</artifactId>
@@ -12,14 +12,14 @@
 	<name>MAVLink Java Generator</name>
 	<description>MAVLink Java code generator for embedded devices or Ground Stations</description>
 	<build>
-	<sourceDirectory>src</sourceDirectory>
-	<testSourceDirectory>test</testSourceDirectory>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>test</testSourceDirectory>
 	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.mavlink</groupId>
 			<artifactId>org.mavlink.util</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
