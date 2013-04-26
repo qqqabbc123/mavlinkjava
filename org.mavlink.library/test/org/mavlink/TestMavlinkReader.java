@@ -39,7 +39,6 @@ public class TestMavlinkReader {
      * @param args
      */
     public static void main(String[] args) {
-        MAVLinkReader reader;
 
         if (args.length != 1) {
             System.out.println("Usage :");
@@ -48,53 +47,87 @@ public class TestMavlinkReader {
             System.exit(1);
         }
         String filename = args[0];
+        testFile(filename);
+        testBuffer(filename);
+    }
+
+    static public void testFile(String filename) {
+        MAVLinkReader reader;
         String fileOut = filename + "-resultat.out";
+        int nb = 0;
         try {
             System.setOut(new PrintStream(fileOut));
             DataInputStream dis = new DataInputStream(new FileInputStream(filename));
-            //reader = new MAVLinkReader(dis, IMAVLinkMessage.MAVPROT_PACKET_START_V09);
             reader = new MAVLinkReader(dis);
-
             while (dis.available() > 0) {
-                //MAVLinkMessage msg = reader.getNextMessage();
-                MAVLinkMessage msg = reader.getNextMessageWithoutBlocking();
+                MAVLinkMessage msg = reader.getNextMessage();
+                //MAVLinkMessage msg = reader.getNextMessageWithoutBlocking();
                 if (msg != null) {
-                    //                    if (msg instanceof msg_param_value) {
-                    //                        msg_param_value m = (msg_param_value) msg;
-                    //                        System.out.println(msg.toString());
-                    //                    }
+                    nb++;
                     System.out.println("SysId=" + msg.sysId + " CompId=" + msg.componentId + " seq=" + msg.sequence + " " + msg.toString());
-                    /*
-                    byte[] buf = msg.encode();
-                    MAVLinkReader test = new MAVLinkReader(new DataInputStream(new ByteArrayInputStream(buf)), IMAVLinkMessage.MAVPROT_PACKET_START_V10);
-                    MAVLinkMessage result = test.getNextMessage();
-                    System.out.println(result.toString());
-                    if (msg != result)
-                        System.out.println("ERROR COMPARE");
-                        */
                 }
-                /*
-                    if (msg.messageType == IMAVLinkMessageID.MAVLINK_MSG_ID_HEARTBEAT) {
-                        System.out.println("MAVLINK_MSG_ID_HEARTBEAT : " + msg);
-                        msg_heartbeat hb_read = (msg_heartbeat) msg;
-                        msg_heartbeat hb = new msg_heartbeat(hb_read.sysId, hb_read.componentId);
-                        hb.sequence = hb_read.sequence;
-                        hb.autopilot = hb_read.autopilot;
-                        hb.base_mode = hb_read.base_mode;
-                        hb.custom_mode = hb_read.custom_mode;
-                        hb.mavlink_version = hb_read.mavlink_version;
-                        hb.system_status = hb_read.system_status;
-                        hb.type = hb_read.type;
-                        byte[] result = hb.encode();
-                        System.out.println("MAVLINK_MSG_ID_HEARTBEAT ==> " + hb);
-                    }
-                }
-                */
             }
             dis.close();
+
+            System.out.println("TOTAL BYTES = " + reader.getTotalBytesReceived());
+            System.out.println("NBMSG (" + nb + ") : " + reader.getNbMessagesReceived() + " NBCRC=" + reader.getBadCRC() + " NBSEQ="
+                               + reader.getBadSequence() + " NBLOST=" + reader.getLostBytes());
         }
         catch (Exception e) {
             System.out.println("ERROR : " + e);
+        }
+    }
+
+    static public void testBuffer(String filename) {
+        MAVLinkReader reader;
+        String fileOut = filename + "-resultat-buffer.out";
+        int nb = 0;
+        int sizeToRead = 4096;
+        int available;
+        byte[] buffer = new byte[4096];
+        MAVLinkMessage msg;
+        try {
+            System.setOut(new PrintStream(fileOut));
+            DataInputStream dis = new DataInputStream(new FileInputStream(filename));
+            reader = new MAVLinkReader();
+            while (dis.available() > 0) {
+                msg = reader.getNextMessage(buffer, 0);
+                if (msg != null) {
+                    nb++;
+                    System.out.println("SysId=" + msg.sysId + " CompId=" + msg.componentId + " seq=" + msg.sequence + " " + msg.toString());
+                }
+                else {
+                    if (dis.available() > 0) {
+                        available = dis.available();
+                        if (available > sizeToRead) {
+                            available = sizeToRead;
+                        }
+                        dis.read(buffer, 0, available);
+                        msg = reader.getNextMessage(buffer, available);
+                        if (msg != null) {
+                            nb++;
+                            System.out.println("SysId=" + msg.sysId + " CompId=" + msg.componentId + " seq=" + msg.sequence + " " + msg.toString());
+                        }
+                    }
+                }
+            }
+            do {
+                msg = reader.getNextMessage(buffer, 0);
+                if (msg != null) {
+                    nb++;
+                    System.out.println("SysId=" + msg.sysId + " CompId=" + msg.componentId + " seq=" + msg.sequence + " " + msg.toString());
+                }
+            }
+            while (msg != null);
+            dis.close();
+
+            System.out.println("TOTAL BYTES = " + reader.getTotalBytesReceived());
+            System.out.println("NBMSG (" + nb + ") : " + reader.getNbMessagesReceived() + " NBCRC=" + reader.getBadCRC() + " NBSEQ="
+                               + reader.getBadSequence() + " NBLOST=" + reader.getLostBytes());
+        }
+        catch (Exception e) {
+            System.out.println("ERROR : " + e);
+            e.printStackTrace();
         }
 
     }
