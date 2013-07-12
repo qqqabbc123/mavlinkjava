@@ -125,7 +125,7 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
             try {
                 String name = attributes.getValue(NAME_ATTR);
                 String s = attributes.getValue(ID_ATTR);
-                int id = s == null ? -1 : Integer.parseInt(attributes.getValue(ID_ATTR));
+                int id = s == null ? -1 : Integer.parseInt(s);
                 currentMessage = mavlink.getMessages().get(name);
                 if (currentMessage == null) {
                     currentMessage = new MAVLinkMessage(id, name);
@@ -142,7 +142,8 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
             try {
                 String name = attributes.getValue(NAME_ATTR);
                 String s = attributes.getValue(VALUE_ATTR);
-                int value = s == null ? -1 : Integer.parseInt(attributes.getValue(VALUE_ATTR));
+                long valuel = s == null ? -1 : Long.decode(s);
+                int value = (int) (valuel & 0x00FFFFFFFF);
                 currentEntry = new MAVLinkEntry(value, name);
             }
             catch (Exception e) {
@@ -174,7 +175,7 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
             buffer = new StringBuffer();
             try {
                 String s = attributes.getValue(INDEX_ATTR);
-                int index = s == null ? -1 : Integer.parseInt(attributes.getValue(INDEX_ATTR));
+                int index = s == null ? -1 : Integer.parseInt(s);
                 currentParam = new MAVLinkParam(index);
             }
             catch (Exception e) {
