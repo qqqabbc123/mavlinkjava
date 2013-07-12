@@ -151,6 +151,13 @@ public class MAVLinkReader {
     }
 
     /**
+     * @return the number of unread messages
+     */
+    public int nbUnreadMessages() {
+        return packets.size();
+    }
+
+    /**
      * Return next message. If bytes available, try to read it.
      * 
      * @return MAVLink message or null
