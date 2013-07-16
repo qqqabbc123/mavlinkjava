@@ -26,11 +26,9 @@ package org.mavlink;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Vector;
 
 import org.mavlink.messages.MAVLinkMessage;
-import org.mavlink.messages.MAVLinkMessageFactory;
 
 /**
  * @author ghelle
@@ -136,7 +134,9 @@ public class MAVLinkReader {
     public MAVLinkReader(DataInputStream dis, byte start) {
         this.dis = dis;
         this.start = start;
-        Arrays.fill(lastSequence, -1);
+        for (int i = 0; i < lastSequence.length; i++) {
+            lastSequence[i] = -1;
+        }
     }
 
     /**
@@ -147,7 +147,9 @@ public class MAVLinkReader {
     public MAVLinkReader(byte start) {
         this.dis = null;
         this.start = start;
-        Arrays.fill(lastSequence, -1);
+        for (int i = 0; i < lastSequence.length; i++) {
+            lastSequence[i] = -1;
+        }
     }
 
     /**
