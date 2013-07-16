@@ -293,6 +293,7 @@ public class MAVLinkGenerator {
                 String id = MAVLINK_MSG + "_ID_" + message.getName();
                 writer.print("  public static final int " + id + " = " + message.getId() + ";\n");
                 writer.print("  private static final long serialVersionUID = " + id + ";\n");
+                writer.print("  public " + className + "() {\n    this(1,1);\n}\n");
                 writer.print("  public " + className + "(int sysId, int componentId) {\n    messageType = " + id
                              + ";\n    this.sysId = sysId;\n    this.componentId = componentId;\n");
 
