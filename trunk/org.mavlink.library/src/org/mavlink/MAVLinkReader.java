@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.mavlink.messages.MAVLinkMessage;
+import org.mavlink.messages.MAVLinkMessageFactory;
 
 /**
  * @author ghelle
