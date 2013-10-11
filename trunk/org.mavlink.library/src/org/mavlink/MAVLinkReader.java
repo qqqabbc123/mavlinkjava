@@ -34,7 +34,6 @@ import org.mavlink.messages.MAVLinkMessageFactory;
 /**
  * @author ghelle
  * @version $Rev$
- * 
  */
 public class MAVLinkReader {
 
@@ -68,7 +67,7 @@ public class MAVLinkReader {
     /**
      * Last sequence number received
      */
-    private int[] lastSequence = new int[256];
+    private final int[] lastSequence = new int[256];
 
     /**
      * Read MAVLink V1.0 packets by default;
@@ -78,7 +77,7 @@ public class MAVLinkReader {
     /**
      * MAVLink messages received
      */
-    private Vector packets = new Vector();
+    private final Vector packets = new Vector();
 
     /**
      * True if we are reading a message
@@ -102,35 +101,36 @@ public class MAVLinkReader {
 
     private long totalBytesReceived = 0;
 
-    private byte[] bytes = new byte[5500];
+    private final byte[] bytes = new byte[5500];
 
     private int offset = 0;;
 
     /**
      * Constructor with MAVLink 1.0 by default and without stream. Must be used whith byte array read methods.
-     * 
      */
     public MAVLinkReader() {
-        this(IMAVLinkMessage.MAVPROT_PACKET_START_V10);
+        // Issue 1 by BoxMonster44 : use correct packet start
+        this((IMAVLinkCRC.MAVLINK_EXTRA_CRC ? IMAVLinkMessage.MAVPROT_PACKET_START_V10 : IMAVLinkMessage.MAVPROT_PACKET_START_V09));
     }
 
     /**
      * Constructor with MAVLink 1.0 by default
      * 
      * @param dis
-     *          Data input stream
+     *            Data input stream
      */
     public MAVLinkReader(DataInputStream dis) {
-        this(dis, IMAVLinkMessage.MAVPROT_PACKET_START_V10);
+        // Issue 1 by BoxMonster44 : use correct packet start
+        this(dis, (IMAVLinkCRC.MAVLINK_EXTRA_CRC ? IMAVLinkMessage.MAVPROT_PACKET_START_V10 : IMAVLinkMessage.MAVPROT_PACKET_START_V09));
     }
 
     /**
      * Constructor
      * 
      * @param dis
-     *          Data input stream
+     *            Data input stream
      * @param start
-     *          Start byte for MAVLink version
+     *            Start byte for MAVLink version
      */
     public MAVLinkReader(DataInputStream dis, byte start) {
         this.dis = dis;
@@ -143,7 +143,8 @@ public class MAVLinkReader {
     /**
      * Constructor for byte array read methods.
      * 
-     * @param start Start byte for MAVLink version
+     * @param start
+     *            Start byte for MAVLink version
      */
     public MAVLinkReader(byte start) {
         this.dis = null;
@@ -179,9 +180,12 @@ public class MAVLinkReader {
 
     /**
      * Return next message. Use it without stream in input.
-     * @param buffer Contains bytes to build next message
-     * @param len Number of byte to use in buffer
-     * @return MAVLink message or null 
+     * 
+     * @param buffer
+     *            Contains bytes to build next message
+     * @param len
+     *            Number of byte to use in buffer
+     * @return MAVLink message or null
      * @throws IOException
      */
     public MAVLinkMessage getNextMessage(byte[] buffer, int len) throws IOException {
@@ -209,8 +213,7 @@ public class MAVLinkReader {
     }
 
     /**
-     * Return next message. If bytes available, try to read it. Don't wait message
-     * is completed, it will be retruned nex time
+     * Return next message. If bytes available, try to read it. Don't wait message is completed, it will be retruned nex time
      * 
      * @return MAVLink message or null
      */
@@ -450,12 +453,12 @@ public class MAVLinkReader {
     }
 
     /**
-     * Read the end of message after the start byte and the payload length. Called
-     * only if there are available character to read all the rest of message
+     * Read the end of message after the start byte and the payload length. Called only if there are available character to read all the rest of
+     * message
      * 
      * @return true if no error occurs
      * @throws IOException
-     *           on read byte function...
+     *             on read byte function...
      */
     protected boolean readEndMessage() throws IOException {
         boolean validData = false;
@@ -534,7 +537,7 @@ public class MAVLinkReader {
      * Check if we don't lost messages...
      * 
      * @param sequence
-     *          current sequence
+     *            current sequence
      * @return true if we don't lost messages
      */
     protected boolean checkSequence(int sysId, int sequence) {
@@ -563,7 +566,7 @@ public class MAVLinkReader {
      * Read Payload bytes
      * 
      * @param nb
-     *          Nb bytes to read
+     *            Nb bytes to read
      * @return Payload bytes
      * @throws IOException
      */
