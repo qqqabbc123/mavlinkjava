@@ -24,9 +24,9 @@ package org.mavlink;
 
 /**
  * Some constants for MAVLink
+ * 
  * @author ghelle
  * @version $Rev$
- *
  */
 public interface IMAVLinkMessage {
 
@@ -36,9 +36,19 @@ public interface IMAVLinkMessage {
     public final static byte MAVPROT_PACKET_START_V10 = (byte) 0xFE;
 
     /**
+     * Packet start in MAVLink V1.0 (String)
+     */
+    public final static String STRING_MAVPROT_PACKET_START_V10 = "0xFE";
+
+    /**
      * Packet start in MAVLink V0.9
      */
     public final static byte MAVPROT_PACKET_START_V09 = (byte) 0x55;
+
+    /**
+     * Packet start in MAVLink V0.9 (String)
+     */
+    public final static String STRING_MAVPROT_PACKET_START_V09 = "0x55";
 
     /**
      * Len to add to payload for CRC computing

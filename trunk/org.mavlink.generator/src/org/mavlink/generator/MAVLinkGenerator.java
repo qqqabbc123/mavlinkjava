@@ -35,11 +35,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.mavlink.IMAVLinkMessage;
 import org.mavlink.MAVLinkCRC;
 import org.xml.sax.SAXException;
 
 /**
  * MAVLink Java generator.
+ * 
  * @author ghelle
  * @version $Rev$
  * @see main
@@ -65,19 +67,20 @@ public class MAVLinkGenerator {
     public static int[] MAVLINK_MESSAGE_CRCS = new int[256];
 
     /**
-     * Main class for the generator.
-     * Command line arguments are :
-     *   source : directory path containing xml files to parse for generation
-     *   target : directory path for output Java source files
-     *   isLittleEndian : true if type are stored in LittleEndian in buffer, false for BigEndian
-     *   forEmbeddedJava : true if generated code must use apis for embedded code, false else
-     *   useExtraByte : if true use extra crc byte to compute CRC
-     *   debug : true to generate toString methods in each message class
-     *   
-     * Example :
-     *   java org.mavlink.generator.MAVLinkGenerator  resources/1.0 target/ true true true true
-     *   Generate MAVLink message Java classes for mavlink xml files contains in resources/1.0 
-     *   in target diretory for Little Endian data, embedded code using extra byte for crc and generating debug code
+     * Main class for the generator. 
+     * 
+     * Command line arguments are : 
+     *     source : directory path containing xml files to parse for generation 
+     *     target : directory path for output Java source files 
+     *     isLittleEndian : true if type are stored in LittleEndian in buffer, false for BigEndian
+     *     forEmbeddedJava : true if generated code must use apis for embedded code, false else 
+     *     useExtraByte : if true use extra crc byte to compute CRC. If true generate for MAVLink 1.0 else MAVLink 0.9
+     *     debug : true to generate toString methods in each message class 
+     *     
+     * Example : java org.mavlink.generator.MAVLinkGenerator resources/1.0 target/ true true true true 
+     *   Generate MAVLink message Java classes for mavlink xml files contains in resources/1.0 in target directory 
+     *   for Little Endian data, embedded code using extra byte for crc and generating debug code
+     * 
      * @param args
      */
     public static void main(String[] args) {
@@ -120,7 +123,7 @@ public class MAVLinkGenerator {
         System.out.println("  target : directory path for output Java source files");
         System.out.println("  isLittleEndian : true if type are stored in LittleEndian in buffer, false for BigEndian");
         System.out.println("  forEmbeddedJava : true if generated code must use apis for embedded code, false else");
-        System.out.println("  useExtraByte : if true use extra crc byte to compute CRC");
+        System.out.println("  useExtraByte : if true use extra crc byte to compute CRC. If true generate for MAVLink 1.0 else MAVLink 0.9");
         System.out.println("  debug : true to generate toString methods in each message class");
         System.out.println("  ");
         System.out.println("Example :");
@@ -131,6 +134,7 @@ public class MAVLinkGenerator {
 
     /**
      * Parse all xml files in directory and call generators methods
+     * 
      * @param path
      */
     protected void parseDirectory(String path) {
@@ -191,11 +195,17 @@ public class MAVLinkGenerator {
 
     /**
      * Parse a MAVLink xml messages descriptor file.
-     * @param mavlink MAVLink data used and to fill
-     * @param file Parsed file
-     * @param path Path to file
-     * @param target Path for generation
-     * @param inInclude True if we are in an include file
+     * 
+     * @param mavlink
+     *            MAVLink data used and to fill
+     * @param file
+     *            Parsed file
+     * @param path
+     *            Path to file
+     * @param target
+     *            Path for generation
+     * @param inInclude
+     *            True if we are in an include file
      * @return implementation code for readers and writers.
      * @throws ParserConfigurationException
      * @throws SAXException
@@ -225,6 +235,7 @@ public class MAVLinkGenerator {
 
     /**
      * Generate MAVLink messages Java classes
+     * 
      * @param mavlink
      * @param targetPath
      */
@@ -250,7 +261,13 @@ public class MAVLinkGenerator {
                 sbWrite = new StringBuffer();
                 fieldWrite = new StringBuffer();
                 if (forEmbeddedJava) {
-                    sbWrite.append("  dos.writeByte((byte)0xFE);\n");
+                    //Issue 1 by BoxMonster44 : use correct packet start for mavlink 0.9
+                    if (useExtraByte) {
+                        sbWrite.append("  dos.writeByte((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V10 + ");\n");
+                    }
+                    else {
+                        sbWrite.append("  dos.writeByte((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V09 + ");\n");
+                    }
                     sbWrite.append("  dos.writeByte(length & 0x00FF);\n");
                     sbWrite.append("  dos.writeByte(sequence & 0x00FF);\n");
                     sbWrite.append("  dos.writeByte(sysId & 0x00FF);\n");
@@ -258,7 +275,13 @@ public class MAVLinkGenerator {
                     sbWrite.append("  dos.writeByte(messageType & 0x00FF);\n");
                 }
                 else {
-                    sbWrite.append("  dos.put((byte)0xFE);\n");
+                    //Issue 1 by BoxMonster44 : use correct packet start for mavlink 0.9
+                    if (useExtraByte) {
+                        sbWrite.append("  dos.writeByte((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V10 + ");\n");
+                    }
+                    else {
+                        sbWrite.append("  dos.writeByte((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V09 + ");\n");
+                    }
                     sbWrite.append("  dos.put((byte)(length & 0x00FF));\n");
                     sbWrite.append("  dos.put((byte)(sequence & 0x00FF));\n");
                     sbWrite.append("  dos.put((byte)(sysId & 0x00FF));\n");
@@ -301,7 +324,10 @@ public class MAVLinkGenerator {
                 String extraCrcBuffer = message.getName() + " ";
                 // Write Fields
                 int fieldLen = 0;
-                Collections.sort(message.getFields(), new FieldCompare());
+                //Issue 1 by BoxMonster44 : don't sort for mavlink 0.9
+                if (useExtraByte) {
+                    Collections.sort(message.getFields(), new FieldCompare());
+                }
                 for (int j = 0; j < message.getFields().size(); j++) {
                     MAVLinkField field = message.getFields().get(j);
                     fieldWrite.append("  /**\n   * " + field.getDescription().trim() + "\n   */\n");
@@ -391,7 +417,10 @@ public class MAVLinkGenerator {
                     // nothing
                 }
                 writer.print("  int crc = MAVLinkCRC.crc_calculate_encode(buffer, " + fieldLen + ");\n");
-                writer.print("  crc = MAVLinkCRC.crc_accumulate((byte) IMAVLinkCRC.MAVLINK_MESSAGE_CRCS[messageType], crc);\n");
+                // Issue 1 by BoxMonster44 : Don't accumulate messageType for mavlink 0.9
+                if (useExtraByte) {
+                    writer.print("  crc = MAVLinkCRC.crc_accumulate((byte) IMAVLinkCRC.MAVLINK_MESSAGE_CRCS[messageType], crc);\n");
+                }
                 writer.print("  byte crcl = (byte) (crc & 0x00FF);\n");
                 writer.print("  byte crch = (byte) ((crc >> 8) & 0x00FF);\n");
                 writer.print("  buffer[" + (fieldLen + 6) + "] = crcl;\n");
@@ -425,6 +454,7 @@ public class MAVLinkGenerator {
 
     /**
      * Generate MAVLink Java Enum classes
+     * 
      * @param mavlink
      * @param targetPath
      * @param implementations
@@ -480,6 +510,7 @@ public class MAVLinkGenerator {
 
     /**
      * Generate Interface which extends all enums classes
+     * 
      * @param targetPath
      * @param implementation
      */
@@ -527,6 +558,7 @@ public class MAVLinkGenerator {
 
     /**
      * Generate a factory classe which generate MAVLink messages from byte array
+     * 
      * @param mavlink
      * @param targetPath
      */
@@ -618,6 +650,7 @@ public class MAVLinkGenerator {
 
     /**
      * Generate Interface with all MAVLink messages ID
+     * 
      * @param mavlink
      * @param targetPath
      */
@@ -663,6 +696,7 @@ public class MAVLinkGenerator {
 
     /**
      * Generate interface with all extra crc for messages
+     * 
      * @param targetPath
      */
     protected void generateIMavlinkCRC(String targetPath) {
@@ -717,6 +751,7 @@ public class MAVLinkGenerator {
 
     /**
      * Generate encode and decode methods for all MAVLink messages
+     * 
      * @param mavlink
      * @param targetPath
      */
