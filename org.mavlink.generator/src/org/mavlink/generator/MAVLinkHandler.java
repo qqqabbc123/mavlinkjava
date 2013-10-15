@@ -37,7 +37,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
 
-    private MAVLinkData mavlink;
+    private final MAVLinkData mavlink;
 
     private boolean inMavlink;
 
@@ -79,6 +79,8 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
 
     MAVLinkGenerator generator;
 
+    int enumValue = 0;
+
     public MAVLinkHandler(MAVLinkGenerator generator, MAVLinkData mavlink, String path, String target) {
         super();
         this.generator = generator;
@@ -87,6 +89,7 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
         this.target = target;
     }
 
+    @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if (qName.equalsIgnoreCase(INCLUDE_TAG)) {
             inInclude = true;
@@ -106,6 +109,7 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
         }
         else if (qName.equalsIgnoreCase(ENUM_TAG)) {
             inEnum = true;
+            enumValue = 0;
             buffer = new StringBuffer();
             try {
                 String name = attributes.getValue(NAME_ATTR);
@@ -142,8 +146,15 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
             try {
                 String name = attributes.getValue(NAME_ATTR);
                 String s = attributes.getValue(VALUE_ATTR);
-                long valuel = s == null ? -1 : Long.decode(s);
-                int value = (int) (valuel & 0x00FFFFFFFF);
+                int value = -1;
+                if (s == null) {
+                    value = enumValue++;
+                }
+                else {
+                    long valuel = Long.decode(s);
+                    value = (int) (valuel & 0x00FFFFFFFF);
+                    enumValue = value + 1;
+                }
                 currentEntry = new MAVLinkEntry(value, name);
             }
             catch (Exception e) {
@@ -188,6 +199,7 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
 
     }
 
+    @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (qName.equalsIgnoreCase(INCLUDE_TAG)) {
             inInclude = false;
@@ -264,6 +276,7 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
 
     }
 
+    @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         String lecture = new String(ch, start, length);
         if (buffer == null) {
@@ -273,10 +286,12 @@ public class MAVLinkHandler extends DefaultHandler implements IMAVLinkTag {
     }
 
     // Begin parsing
+    @Override
     public void startDocument() throws SAXException {
     }
 
     // End parsing
+    @Override
     public void endDocument() throws SAXException {
     }
 

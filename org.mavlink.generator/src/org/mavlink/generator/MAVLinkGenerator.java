@@ -277,10 +277,10 @@ public class MAVLinkGenerator {
                 else {
                     //Issue 1 by BoxMonster44 : use correct packet start for mavlink 0.9
                     if (useExtraByte) {
-                        sbWrite.append("  dos.writeByte((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V10 + ");\n");
+                        sbWrite.append("  dos.put((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V10 + ");\n");
                     }
                     else {
-                        sbWrite.append("  dos.writeByte((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V09 + ");\n");
+                        sbWrite.append("  dos.put((byte)" + IMAVLinkMessage.STRING_MAVPROT_PACKET_START_V09 + ");\n");
                     }
                     sbWrite.append("  dos.put((byte)(length & 0x00FF));\n");
                     sbWrite.append("  dos.put((byte)(sequence & 0x00FF));\n");
@@ -425,8 +425,16 @@ public class MAVLinkGenerator {
                 writer.print("  byte crch = (byte) ((crc >> 8) & 0x00FF);\n");
                 writer.print("  buffer[" + (fieldLen + 6) + "] = crcl;\n");
                 writer.print("  buffer[" + (fieldLen + 7) + "] = crch;\n");
+                if (forEmbeddedJava) {
+                    if (isLittleEndian) {
+                        writer.print("  dos.close();\n");
+                    }
+                    else {
+                        writer.print("  baos.close();\n");
+                        writer.print("  dos.close();\n");
+                    }
+                }
                 writer.print("  return buffer;\n}\n");
-
                 if (debug) {
                     writer.print("public String toString() {\n");
                     writer.print("return \"" + id + " : \" + " + forToString + ";");

@@ -4,10 +4,11 @@
 	<parent>
 		<groupId>org.mavlink</groupId>
 		<artifactId>org.mavlink.maven</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.4</version>
 		<relativePath>../org.mavlink.maven</relativePath>
 	</parent>
 	<artifactId>org.mavlink.library</artifactId>
+	<version>1.0.4</version>
 	<packaging>jar</packaging>
 	<name>MAVLink Java Library</name>
 	<description>MAVLink Java Library for embedded devices or Ground Stations</description>
@@ -17,6 +18,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.8</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -38,7 +40,7 @@
 		<dependency>
 			<groupId>org.mavlink</groupId>
 			<artifactId>org.mavlink.util</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
