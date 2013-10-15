@@ -40,7 +40,7 @@ public class MavlinkGeneratorTest {
     @Test
     public void testMain() {
         try {
-            String[] args = { "test\\ardupilotmega.xml", "../org.mavlink.library/generated/", "true", "true", "true", "true" };
+            String[] args = { "test\\ja4rtor.xml", "../org.mavlink.library/generated/", "true", "false", "true", "true" };
             MAVLinkGenerator.main(args);
         }
         catch (Exception e) {
