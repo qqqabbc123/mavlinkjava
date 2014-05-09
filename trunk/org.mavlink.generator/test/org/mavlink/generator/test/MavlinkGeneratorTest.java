@@ -24,6 +24,8 @@ package org.mavlink.generator.test;
 
 import static org.junit.Assert.fail;
 
+import java.io.File;
+
 import org.junit.Test;
 import org.mavlink.generator.MAVLinkGenerator;
 
@@ -40,7 +42,9 @@ public class MavlinkGeneratorTest {
     @Test
     public void testMain() {
         try {
-            String[] args = { "test\\ja4rtor.xml", "../org.mavlink.library/generated/", "true", "false", "true", "true" };
+            String[] args = { "test" + File.separator + "ja4rtor.xml",
+                             ".." + File.separator + "org.mavlink.library" + File.separator + "generated" + File.separator + "", "true", "true",
+                             "true", "true" };
             MAVLinkGenerator.main(args);
         }
         catch (Exception e) {
