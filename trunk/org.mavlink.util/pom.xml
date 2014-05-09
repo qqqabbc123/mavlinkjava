@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.mavlink</groupId>
 		<artifactId>org.mavlink.maven</artifactId>
-		<version>1.0.4</version>
 		<relativePath>../org.mavlink.maven</relativePath>
+		<version>1.0.5</version>
 	</parent>
 	<artifactId>org.mavlink.util</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<packaging>jar</packaging>
 	<name>MAVLink Java Tools</name>
 	<description>MAVLink Java CRC calculation and messages interface for embedded devices or Ground Stations</description>
